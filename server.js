@@ -12,7 +12,7 @@ app.use(cors( {} ))
 app.use(express.json()) 
 
 
-initializeDB
+initializeDB()
 
 
 app.use("/user", userRouter) 
@@ -21,6 +21,7 @@ app.use("/user", userRouter)
 app.listen(process.env.PORT, () => {                        
     console.log("Listen to port " + process.env.PORT);         
 })
+
 
 
 
