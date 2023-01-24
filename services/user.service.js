@@ -25,8 +25,6 @@ async function login(email, password) {
 
     if (currentUser) {
 
-        try {
-
             const isPasswordOk = await bcrypt.compare(password, currentUser.password)
 
             if (isPasswordOk) {
@@ -35,17 +33,15 @@ async function login(email, password) {
                 return {
                     token
                 }
-
             }
-        }
-
-        catch (err) {
-            console.log(err);
-        }
+            throw new Error('Mot de passe incorrect')
+        
+        
 
     }
 
-    return null
+    else throw new Error('Email incorrect')
+    // return null
 }
 
 

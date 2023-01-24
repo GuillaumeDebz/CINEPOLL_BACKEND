@@ -23,10 +23,14 @@ const userController = {
     // LOGIN //
     login: async(req, res) => {
         const { email, password } = req.body
-        const token = await userService.login(email, password)
-
-        if(!token) res.status(500).json({ err: "Email et/ou mot de passe incorrect"})
-        else res.status(200).json(token)
+        try {
+            const token = await userService.login(email, password)
+    
+            res.status(200).json(token)
+            
+        } catch (error) {
+            res.status(400).send("Email ou mot de passe incorrect")
+        }
     }
 
 
