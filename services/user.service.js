@@ -1,3 +1,4 @@
+// Imports //
 const User = require("../models/user.model")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
@@ -29,13 +30,13 @@ async function login(email, password) {
             const isPasswordOk = await bcrypt.compare(password, currentUser.password)
 
             if (isPasswordOk) {
-                const token = jwt.sign({ id: currentUser._id }, process.env.ACCESSTOKENSECRET, { expiresIn: "1h" })
+                const token = jwt.sign({ id: currentUser._id }, process.env.ACCESSTOKENSECRET, { expiresIn: process.env.JWTExpiry })
 
                 return {
                     token
                 }
-            }
 
+            }
         }
 
         catch (err) {
@@ -45,7 +46,6 @@ async function login(email, password) {
     }
 
     return null
-
 }
 
 
