@@ -5,19 +5,58 @@ const jwt = require("jsonwebtoken")
 
 
 
-// REGISTER //
-async function register(data) {
+// REGISTER NEW USER //
+async function register(email, pseudo, password) {
 
-    const salt = await bcrypt.genSalt(10)
-    data.password = await bcrypt.hash(data.password, salt)
+    const existingEmail = await User.findOne({ email })
+    
+    // SI EMAIL PAS EXISTANT //
+    if (!existingEmail) {
+
+        // CREATION USER //
+        const salt = await bcrypt.genSalt(10)
+        password = await bcrypt.hash(password, salt)
+
+        const data = {email, pseudo, password};
+
+        await User.create(data)
 
 
-    await User.create(data)
+        // TOKEN //
+        const currentUser = await User.findOne({ email })
+        const token = jwt.sign({ id: currentUser._id }, process.env.ACCESSTOKENSECRET, { expiresIn: process.env.JWTEXPIRE })
+
+        return {
+            token
+        }
+    }
+
+    else throw new Error('Email déjà existant')
+
 }
 
 
+// UPDATE USER //
+async function update(data) {
 
-// LOGIN //
+    const currentUser = await User.findOne({ email })
+
+    if (currentUser) {
+
+        const salt = await bcrypt.genSalt(10)
+        data.password = await bcrypt.hash(data.password, salt)
+    
+    
+        await User.create(data)
+        }    
+
+    else throw new Error('Email incorrect')
+    
+
+}
+
+
+// LOGIN EXISTING USER //
 async function login(email, password) {
 
     const currentUser = await User.findOne({ email })
@@ -25,23 +64,22 @@ async function login(email, password) {
 
     if (currentUser) {
 
-            const isPasswordOk = await bcrypt.compare(password, currentUser.password)
+        const isPasswordOk = await bcrypt.compare(password, currentUser.password)
 
-            if (isPasswordOk) {
-                const token = jwt.sign({ id: currentUser._id }, process.env.ACCESSTOKENSECRET, { expiresIn: process.env.JWTExpiry })
+        if (isPasswordOk) {
+            const token = jwt.sign({ id: currentUser._id }, process.env.ACCESSTOKENSECRET, { expiresIn: process.env.JWTEXPIRE })
 
-                return {
-                    token
-                }
+            return {
+                token
             }
-            throw new Error('Mot de passe incorrect')
-        
-        
+        }
+        throw new Error('Mot de passe incorrect')
+
+
 
     }
 
     else throw new Error('Email incorrect')
-    // return null
 }
 
 
@@ -52,5 +90,6 @@ async function login(email, password) {
 
 module.exports = {
     register,
+    update,
     login
 }

@@ -1,5 +1,5 @@
 // Imports //
-require("dotenv").config()    // cibler le port dev?  
+require("dotenv").config()  
 var cors = require("cors")                          
 const express = require("express")
 const initializeDB = require("./config/db")
