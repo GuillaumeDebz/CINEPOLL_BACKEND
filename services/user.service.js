@@ -9,30 +9,36 @@ const jwt = require("jsonwebtoken")
 async function register(email, pseudo, password) {
 
     const existingEmail = await User.findOne({ email })
-    
+
     // SI EMAIL PAS EXISTANT //
     if (!existingEmail) {
 
-        // CREATION USER //
-        const salt = await bcrypt.genSalt(10)
-        password = await bcrypt.hash(password, salt)
+        const existingPseudo = await User.findOne({ pseudo })
 
-        const data = {email, pseudo, password};
+        // SI PSEUDO PAS EXISTANT //
+        if (!existingPseudo) {
 
-        await User.create(data)
+            // CREATION USER //
+            const salt = await bcrypt.genSalt(10)
+            password = await bcrypt.hash(password, salt)
+
+            const data = { email, pseudo, password };
+
+            await User.create(data)
 
 
-        // TOKEN //
-        const currentUser = await User.findOne({ email })
-        const token = jwt.sign({ id: currentUser._id }, process.env.ACCESSTOKENSECRET, { expiresIn: process.env.JWTEXPIRE })
+            // TOKEN //
+            const currentUser = await User.findOne({ email })
+            const token = jwt.sign({ id: currentUser._id }, process.env.ACCESSTOKENSECRET, { expiresIn: process.env.JWTEXPIRE })
 
-        return {
-            token
+            return {
+                token
+            }
         }
+        else throw new Error('Email et/ou pseudo invalide')
     }
 
-    else throw new Error('Email déjà existant')
-
+    else throw new Error('Email et/ou pseudo invalide')
 }
 
 
@@ -45,14 +51,12 @@ async function update(data) {
 
         const salt = await bcrypt.genSalt(10)
         data.password = await bcrypt.hash(data.password, salt)
-    
-    
+
+
         await User.create(data)
-        }    
+    }
 
     else throw new Error('Email incorrect')
-    
-
 }
 
 
@@ -74,22 +78,47 @@ async function login(email, password) {
             }
         }
         throw new Error('Mot de passe incorrect')
-
-
-
     }
 
     else throw new Error('Email incorrect')
 }
 
 
+// ADD FRIEND //
+async function addFriend(userId, pseudo) {
+
+    console.log(pseudo);
+
+    const currentUser = await User.findById(userId);
+    const friendUser = await User.findOne({ pseudo: { $regex: new RegExp(pseudo, 'i')} })       // pseudo reçu --> insensitive search dans le field pseudo (`/^${pseudo}$/i`)
+   
+    console.log('currentUser', currentUser);
+    console.log('friendUser', friendUser);
+ 
+    // SI PSEUDO PAS EXISTANT & PAS SOI-MÊME //
+    if (friendUser && friendUser!=currentUser) {
+
+        currentUser.friends.push(friendUser._id)
+
+        await currentUser.save()
+    }
+
+    else throw new Error('Pseudo inexistant')
+
+}
 
 
-
+// GET FRIEND LIST //
+async function getFriendsList() {
+    const friends = User.find("friends", "pseudo")        
+    return friends                                                                    
+}   
 
 
 module.exports = {
     register,
     update,
-    login
+    login,
+    addFriend,
+    getFriendsList
 }

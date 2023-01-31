@@ -16,7 +16,7 @@ const userController = {
         }
         catch (err) {
             console.log(err.message)
-            res.status(500).json( err.message )
+            res.status(500).send("Email et/ou pseudo invalide")
         }
 
     },
@@ -48,7 +48,42 @@ const userController = {
         } catch (error) {
             res.status(400).send("Email ou mot de passe incorrect")
         }
+    },
+
+
+    // ADD FRIEND //
+    addFriend: async (req, res) => {
+
+        // FIXME Fix degeulasse ou on prend un id hardcodé
+        // Veuillez remplacer ceci par l'utilisation de votre token (envoyer via interceptor dans angular)
+        // NB : Ceci ne doit plus etre present lors de la présentation :D
+        const id = '63d90cdbe13d2566df0cfc14'
+        // ↑ Remove this shit     (╯°□°）╯︵ ┻━┻
+
+        console.log("hello");
+        const { pseudo } = req.body
+        console.log(req.body);
+        try {
+           await userService.addFriend(id, pseudo)
+            res.sendStatus(204)
+
+        } catch (error) {
+            res.status(500).json( error.message )
+        }
+    },
+
+    // ADD FRIEND //
+    getFriendList: async (req, res) => {
+
+            try {
+                const friends = await userService.getFriendsList()
+                res.status(200).json(friends)
+
+            } catch (error) {
+                res.status(500).json( err.message )
+            }
     }
+
 
 
 }

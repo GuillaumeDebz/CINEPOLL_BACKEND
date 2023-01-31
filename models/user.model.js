@@ -7,8 +7,8 @@ const User = new Schema({
     pseudo: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    friends: [{ type: ObjectId, ref:"FriendList"}] 
-
+    currentPoll: { type: String, required: false },
+    friends: [{ type: ObjectId, ref:"User"}] 
 })
 
 
