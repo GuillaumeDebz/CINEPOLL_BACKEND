@@ -7,21 +7,20 @@ const authMiddleware = (req, res, next) => {
     if (authHeader) {
         const token = authHeader.split(" ")[1]
         jwt.verify(token, process.env.ACCESSTOKENSECRET, (err, user) => {
-
-            if (err) { 
-                return res.sendStatus(401) 
+            
+            if (err) {
+                return res.sendStatus(403) 
             }
-
+            
             req.user = user
             next()
+        })
 
-            })
+    }
 
-        }
-    
-        else { 
-            res.sendStatus(401) 
-        }
+    else {
+        res.sendStatus(401)
+    }
 }
 
 

@@ -54,15 +54,9 @@ const userController = {
     // ADD FRIEND //
     addFriend: async (req, res) => {
 
-        // FIXME Fix degeulasse ou on prend un id hardcodé
-        // Veuillez remplacer ceci par l'utilisation de votre token (envoyer via interceptor dans angular)
-        // NB : Ceci ne doit plus etre present lors de la présentation :D
-        const id = '63d90cdbe13d2566df0cfc14'
-        // ↑ Remove this shit     (╯°□°）╯︵ ┻━┻
-
-        console.log("hello");
+        const { id } = req.user;
         const { pseudo } = req.body
-        console.log(req.body);
+
         try {
            await userService.addFriend(id, pseudo)
             res.sendStatus(204)

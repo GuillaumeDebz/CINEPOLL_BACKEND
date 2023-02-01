@@ -90,20 +90,20 @@ async function addFriend(userId, pseudo) {
     console.log(pseudo);
 
     const currentUser = await User.findById(userId);
-    const friendUser = await User.findOne({ pseudo: { $regex: new RegExp(pseudo, 'i')} })       // pseudo reçu --> insensitive search dans le field pseudo (`/^${pseudo}$/i`)
+    const friendUser = await User.findOne({ pseudo: { $regex: new RegExp('^' + pseudo +'$', 'i')} })       // pseudo reçu --> insensitive search dans le field pseudo `/^${pseudo}$/i` || '/^'+pseudo+'$/i'
    
     console.log('currentUser', currentUser);
     console.log('friendUser', friendUser);
  
-    // SI PSEUDO PAS EXISTANT & PAS SOI-MÊME //
-    if (friendUser && friendUser!=currentUser) {
+    // SI PSEUDO PAS EXISTANT & PAS SOI-MÊME & PAS DEJA EN AMI //
+    if (friendUser && friendUser.id!=currentUser.id && currentUser.friends.includes(friendUser.id) ) {
 
         currentUser.friends.push(friendUser._id)
 
         await currentUser.save()
     }
 
-    else throw new Error('Pseudo inexistant')
+    else throw new Error('Pseudo invalide')
 
 }
 
