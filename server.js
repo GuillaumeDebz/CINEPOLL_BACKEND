@@ -22,7 +22,6 @@ initializeDB()
 // use router //
 app.use("/user", userRouter) 
 
-
 // Listen to db //
 app.listen(process.env.PORT, () => {                        
     console.log("Listen to port " + process.env.PORT);         

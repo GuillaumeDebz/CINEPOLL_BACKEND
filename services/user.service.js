@@ -8,19 +8,19 @@ const jwt = require("jsonwebtoken")
 // REGISTER NEW USER //
 async function register(email, pseudo, password) {
 
-    const existingEmail = await User.findOne({ email })
+    const existingEmail = await User.findOne({ email });
 
     // SI EMAIL PAS EXISTANT //
     if (!existingEmail) {
 
-        const existingPseudo = await User.findOne({ pseudo })
+        const existingPseudo = await User.findOne({ pseudo });
 
         // SI PSEUDO PAS EXISTANT //
         if (!existingPseudo) {
 
             // CREATION USER //
-            const salt = await bcrypt.genSalt(10)
-            password = await bcrypt.hash(password, salt)
+            const salt = await bcrypt.genSalt(10);
+            password = await bcrypt.hash(password, salt);
 
             const data = { email, pseudo, password };
 
@@ -28,47 +28,47 @@ async function register(email, pseudo, password) {
 
 
             // TOKEN //
-            const currentUser = await User.findOne({ email })
+            const currentUser = await User.findOne({ email });
             const token = jwt.sign({ id: currentUser._id }, process.env.ACCESSTOKENSECRET, { expiresIn: process.env.JWTEXPIRE })
 
             return {
                 token
             }
         }
-        else throw new Error('Email et/ou pseudo invalide')
+        else throw new Error('Email et/ou pseudo invalide');
     }
 
-    else throw new Error('Email et/ou pseudo invalide')
-}
+    else throw new Error('Email et/ou pseudo invalide');
+};
 
 
 // UPDATE USER //
 async function update(data) {
 
-    const currentUser = await User.findOne({ email })
+    const currentUser = await User.findOne({ email });
 
     if (currentUser) {
 
-        const salt = await bcrypt.genSalt(10)
-        data.password = await bcrypt.hash(data.password, salt)
+        const salt = await bcrypt.genSalt(10);
+        data.password = await bcrypt.hash(data.password, salt);
 
 
-        await User.create(data)
+        await User.create(data);
     }
 
-    else throw new Error('Email incorrect')
-}
+    else throw new Error('Email incorrect');
+};
 
 
 // LOGIN EXISTING USER //
 async function login(email, password) {
 
-    const currentUser = await User.findOne({ email })
+    const currentUser = await User.findOne({ email });
     console.log(currentUser);
 
     if (currentUser) {
 
-        const isPasswordOk = await bcrypt.compare(password, currentUser.password)
+        const isPasswordOk = await bcrypt.compare(password, currentUser.password);
 
         if (isPasswordOk) {
             const token = jwt.sign({ id: currentUser._id }, process.env.ACCESSTOKENSECRET, { expiresIn: process.env.JWTEXPIRE })
@@ -77,11 +77,11 @@ async function login(email, password) {
                 token
             }
         }
-        throw new Error('Mot de passe incorrect')
+        throw new Error('Mot de passe incorrect');
     }
 
-    else throw new Error('Email incorrect')
-}
+    else throw new Error('Email incorrect');
+};
 
 
 // ADD FRIEND //
@@ -90,29 +90,39 @@ async function addFriend(userId, pseudo) {
     console.log(pseudo);
 
     const currentUser = await User.findById(userId);
-    const friendUser = await User.findOne({ pseudo: { $regex: new RegExp('^' + pseudo +'$', 'i')} })       // pseudo reçu --> insensitive search dans le field pseudo `/^${pseudo}$/i` || '/^'+pseudo+'$/i'
+    const friendUser = await User.findOne({ pseudo: { $regex: new RegExp('^' + pseudo +'$', 'i')} });       // pseudo reçu --> insensitive search dans le field pseudo `/^${pseudo}$/i` || '/^'+pseudo+'$/i'
    
     console.log('currentUser', currentUser);
     console.log('friendUser', friendUser);
  
     // SI PSEUDO PAS EXISTANT & PAS SOI-MÊME & PAS DEJA EN AMI //
-    if (friendUser && friendUser.id!=currentUser.id && currentUser.friends.includes(friendUser.id) ) {
+    if (friendUser && friendUser.id!=currentUser.id && !currentUser.friends.includes(friendUser.id) ) {
 
-        currentUser.friends.push(friendUser._id)
+        currentUser.friends.push(friendUser._id);
 
-        await currentUser.save()
+        await currentUser.save();
     }
 
-    else throw new Error('Pseudo invalide')
-
-}
+    else throw new Error('Pseudo invalide');
+};
 
 
 // GET FRIEND LIST //
-async function getFriendsList() {
-    const friends = User.find("friends", "pseudo")        
-    return friends                                                                    
-}   
+async function getFriendsList(userId) {
+    
+    const currentUser = await User.findById(userId).populate('friends');            // Populate toujours sur un model
+
+    console.log(currentUser);
+
+    if (currentUser.friends) {
+
+        const friends = currentUser.friends.map(f => f.pseudo);               
+        
+        return friends
+    }
+
+    else throw new Error(`Liste d'amis vide`);
+};
 
 
 module.exports = {
@@ -121,4 +131,4 @@ module.exports = {
     login,
     addFriend,
     getFriendsList
-}
+};

@@ -7,10 +7,13 @@ const authMiddleware = (req, res, next) => {
     if (authHeader) {
         const token = authHeader.split(" ")[1]
         jwt.verify(token, process.env.ACCESSTOKENSECRET, (err, user) => {
-            
+            console.log(token);
             if (err) {
+                console.log('error ici', err);
                 return res.sendStatus(403) 
             }
+
+            console.log('ici dodo ', user);
             
             req.user = user
             next()

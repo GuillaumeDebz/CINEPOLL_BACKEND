@@ -66,18 +66,21 @@ const userController = {
         }
     },
 
-    // ADD FRIEND //
+
+    // FRIENDS LIST  //
     getFriendList: async (req, res) => {
 
+        const { id } = req.user;
+
             try {
-                const friends = await userService.getFriendsList()
+                const friends = await userService.getFriendsList(id)
                 res.status(200).json(friends)
 
-            } catch (error) {
-                res.status(500).json( err.message )
+            } catch (err) {
+                console.log(err);
+                res.sendStatus(500);
             }
     }
-
 
 
 }
