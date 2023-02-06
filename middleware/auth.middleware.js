@@ -13,7 +13,7 @@ const authMiddleware = (req, res, next) => {
                 return res.sendStatus(403) 
             }
 
-            console.log('ici dodo ', user);
+            console.log(user);
             
             req.user = user
             next()

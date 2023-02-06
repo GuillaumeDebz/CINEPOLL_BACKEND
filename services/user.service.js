@@ -116,8 +116,10 @@ async function getFriendsList(userId) {
 
     if (currentUser.friends) {
 
-        const friends = currentUser.friends.map(f => f.pseudo);               
-        
+        const friends = currentUser.friends.map(f => ({pseudo: f.pseudo}));  
+                     
+        friends.sort((a,b) => (a.pseudo > b.pseudo) ? 1 : ((b.pseudo > a.pseudo) ? -1 : 0)) // Donne un poids au pseudo et trie en fct du poids
+
         return friends
     }
 
