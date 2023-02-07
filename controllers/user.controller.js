@@ -62,7 +62,7 @@ const userController = {
             res.sendStatus(204)
 
         } catch (error) {
-            res.status(500).json({ error: error.message })
+            res.status(500).json( error.message )
         }
     },
 
