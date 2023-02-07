@@ -16,7 +16,7 @@ const userController = {
         }
         catch (err) {
             console.log(err.message)
-            res.status(500).send("Email et/ou pseudo invalide")
+            res.status(400).send("Email et/ou pseudo invalide")
         }
 
     },
